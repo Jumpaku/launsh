@@ -17,19 +17,16 @@ jobs:
         with:
           flutter-version: '3.32.2'
           cache: true
-      - name: Install dependencies
-        run: flutter pub get
-      - name: Build Windows application
-        run: flutter build windows --release
-      - name: Package Windows release
-        run: Compress-Archive -Path build/windows/runner/Release -DestinationPath launsh-windows-${{ github.ref_name }}.zip
-        shell: pwsh
-      - name: Upload Windows artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: launsh-windows-release-${{ github.ref_name }}
-          path: launsh-windows-${{ github.ref_name }}.zip
-
+      - name: Build and Upload macOS artifact
+        env:
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          flutter pub get
+          flutter build windows --release
+          powershell Compress-Archive -Path build/windows/x64/runner/Release -DestinationPath launsh-windows-x64-${GITHUB_REF_NAME}.zip
+          gh release upload --clobber "${GITHUB_REF_NAME}" "launsh-windows-x64-${GITHUB_REF_NAME}.zip"
+  
   build-macos:
     name: Build for macOS
     runs-on: macos-latest
@@ -42,14 +39,12 @@ jobs:
         with:
           flutter-version: '3.32.2'
           cache: true
-      - name: Install dependencies
-        run: flutter pub get
-      - name: Build macOS application
-        run: flutter build macos --release
-      - name: Package macOS release
-        run: zip -r launsh-macos-${{ github.ref_name }}.zip build/macos/Build/Products/Release/launsh.app
-      - name: Upload macOS artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: launsh-macos-release-${{ github.ref_name }}
-          path: launsh-macos-${{ github.ref_name }}.zip
+      - name: Build and Upload macOS artifact
+        env:
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          flutter pub get
+          flutter build macos --release
+          zip launsh-macos-${GITHUB_REF_NAME}.zip build/macos/Build/Products/Release/launsh.app
+          gh release upload --clobber "${GITHUB_REF_NAME}" "launsh-macos-${GITHUB_REF_NAME}.zip"
