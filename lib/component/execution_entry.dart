@@ -10,14 +10,14 @@ import 'package:path/path.dart' as path;
 typedef LogCallback = void Function(String message);
 
 class ExecutionEntry extends StatefulWidget {
-  final String configDir;
+  final String workingDir;
   final String name;
   final Execution execution;
   final LogCallback onLog; // Callback to send logs to the parent.
 
   const ExecutionEntry({
     super.key,
-    required this.configDir,
+    required this.workingDir,
     required this.name,
     required this.execution,
     required this.onLog,
@@ -46,7 +46,7 @@ class _ExecutionEntryState extends State<ExecutionEntry> {
     super.dispose();
   }
 
-  String get _interpolatedCommand {
+  String get _command {
     return '${widget.execution.program} ${widget.execution.args.join(' ')}';
   }
 
@@ -54,7 +54,7 @@ class _ExecutionEntryState extends State<ExecutionEntry> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => RunDialog(
-        command: _interpolatedCommand,
+        command: _command,
         variableNames: widget.execution.variable,
         variableControllers: _variableControllers,
       ),
@@ -65,22 +65,22 @@ class _ExecutionEntryState extends State<ExecutionEntry> {
   }
 
   Future<void> _runExecution() async {
-    widget.onLog('Running command: $_interpolatedCommand');
+    widget.onLog('Running command: $_command');
     final execution = widget.execution;
-    final workingDir = path.join(widget.configDir, execution.workingDir);
+    final workingDir = widget.workingDir;
+    final stdout = execution.stdout == null
+        ? null
+        : File(path.join(workingDir, execution.stdout!));
+    final stderr = execution.stderr == null
+        ? null
+        : File(path.join(workingDir, execution.stderr!));
 
     try {
       final variables = {
         for (final e in _variableControllers.entries) e.key: e.value.text,
       };
-      final stdout = execution.stdout == null ? null : path.join(workingDir, execution.stdout);
-      final stderr = execution.stderr == null ? null : path.join(workingDir, execution.stderr);
-      if (stdout != null) {
-        File(stdout).createSync(recursive: true);
-      }
-      if (stderr != null) {
-        File(stderr).createSync(recursive: true);
-      }
+      stdout?.createSync(recursive: true);
+      stderr?.createSync(recursive: true);
 
       final process = await Process.start(
         execution.program,
@@ -92,16 +92,12 @@ class _ExecutionEntryState extends State<ExecutionEntry> {
 
       process.stdout.transform(utf8.decoder).listen((data) {
         if (data.trim().isNotEmpty) widget.onLog('STDOUT: ${data.trim()}');
-        if (stdout != null) {
-          File(stdout).writeAsStringSync(data, mode: FileMode.writeOnlyAppend);
-        }
+        stdout?.writeAsStringSync(data, mode: FileMode.writeOnlyAppend);
       });
 
       process.stderr.transform(utf8.decoder).listen((data) {
         if (data.trim().isNotEmpty) widget.onLog('STDERR: ${data.trim()}');
-        if (stderr != null) {
-          File(stderr).writeAsStringSync(data, mode: FileMode.writeOnlyAppend);
-        }
+        stderr?.writeAsStringSync(data, mode: FileMode.writeOnlyAppend);
       });
 
       final exitCode = await process.exitCode;
@@ -142,7 +138,7 @@ class _ExecutionEntryState extends State<ExecutionEntry> {
             ),
             const SizedBox(height: 4),
             Text(
-              _interpolatedCommand,
+              _command,
               style: TextStyle(
                 fontFamily: 'monospace',
                 color: Colors.grey.shade700,

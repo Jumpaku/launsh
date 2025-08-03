@@ -2,17 +2,17 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:path/path.dart' as path;
 import 'package:launsh/component/execution_entry.dart';
 import 'package:launsh/schema/config.dart';
+import 'package:path/path.dart' as path;
 
 class ExecutionList extends StatefulWidget {
-  final String? configFilePath;
+  final String? workingDir;
   final LogCallback onLog;
 
   const ExecutionList({
     super.key,
-    required this.configFilePath,
+    required this.workingDir,
     required this.onLog,
   });
 
@@ -26,13 +26,17 @@ class _ExecutionListState extends State<ExecutionList> {
   @override
   void didUpdateWidget(covariant ExecutionList oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _loadConfig(widget.configFilePath);
+    if (widget.workingDir != null) {
+      _loadConfig(path.join(widget.workingDir!, 'launsh.json'));
+    }
   }
 
   @override
   void initState() {
     super.initState();
-    _loadConfig(widget.configFilePath);
+    if (widget.workingDir != null) {
+      _loadConfig(path.join(widget.workingDir!, 'launsh.json'));
+    }
   }
 
   Future<void> _loadConfig(String? path) async {
@@ -47,6 +51,8 @@ class _ExecutionListState extends State<ExecutionList> {
       final jsonStr = await file.readAsString();
       final jsonMap = json.decode(jsonStr) as Map<String, dynamic>;
       final config = Config.fromJson(jsonMap);
+      config.validate();
+
       setState(() {
         _config = config;
       });
@@ -60,12 +66,11 @@ class _ExecutionListState extends State<ExecutionList> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.workingDir == null) {
+      return const Center(child: Text('Please select a working directory.'));
+    }
     if (_config == null) {
-      if (widget.configFilePath == null) {
-        return const Center(child: Text('Please select a config file.'));
-      } else {
-        return const Center(child: Text('Loading or failed to load config...'));
-      }
+      return const Center(child: Text('Loading or failed to load config...'));
     }
     return ListView(
       padding: const EdgeInsets.all(8),
@@ -75,7 +80,7 @@ class _ExecutionListState extends State<ExecutionList> {
         return ExecutionEntry(
           // Using a key is good practice for lists of stateful widgets
           key: ValueKey(name),
-          configDir: path.dirname(widget.configFilePath!),
+          workingDir: widget.workingDir!,
           name: name,
           execution: execution,
           onLog: widget.onLog,

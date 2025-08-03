@@ -9,7 +9,6 @@ class Execution {
     this.description,
     required this.program,
     this.args = const [],
-    this.workingDir,
     this.environment = const {},
     this.variable = const [],
     this.stdout,
@@ -28,10 +27,6 @@ class Execution {
 
   /// A list of arguments for the execution.
   final List<String> args;
-
-  /// The working directory from which to run the execution.
-  @JsonKey(name: 'working_dir')
-  final String? workingDir;
 
   /// A map of environment variables for the execution.
   final Map<String, String> environment;

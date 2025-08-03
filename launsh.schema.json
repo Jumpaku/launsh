@@ -31,10 +31,6 @@
             "type": "string"
           }
         },
-        "working_dir": {
-          "description": "The working directory from which to run the execution.",
-          "type": "string"
-        },
         "stdout": {
           "description": "The path to a file to which standard output is redirected.",
           "type": "string"

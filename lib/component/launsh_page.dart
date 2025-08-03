@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:launsh/component/execution_list.dart';
 import 'package:launsh/component/app_log.dart';
 import 'package:launsh/component/app_log_controller.dart';
+import 'package:launsh/component/execution_list.dart';
+import 'package:path/path.dart' as path;
 
 class LaunshPage extends StatefulWidget {
   const LaunshPage({super.key});
@@ -12,25 +15,26 @@ class LaunshPage extends StatefulWidget {
 }
 
 class _LaunshPageState extends State<LaunshPage> {
-  String? _configFilePath;
+  String? _workingDir;
   final AppLogController _logController = AppLogController();
 
-  Future<void> _pickAndLoadFile() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['json'],
-    );
+  Future<void> _pickWorkingDir() async {
+    final workingDir = await FilePicker.platform.getDirectoryPath();
 
-    if (result != null && result.files.single.path != null) {
-      final path = result.files.single.path!;
-      try {
+    if (workingDir != null) {
+      final configFile = File(path.join(workingDir, 'launsh.json'));
+      if (!configFile.existsSync()) {
         setState(() {
-          _configFilePath = path;
-          _logController.clear();
-          _logController.add('Loaded configuration from: $path');
+          _workingDir = null;
+          _logController.add(
+            'Config file "launsh.json" not found in the selected directory: $workingDir',
+          );
         });
-      } catch (e) {
-        _logController.add('Error loading or parsing config file: $e');
+      } else {
+        setState(() {
+          _workingDir = workingDir;
+          _logController.add('Selected working directory: $workingDir');
+        });
       }
     }
   }
@@ -46,27 +50,27 @@ class _LaunshPageState extends State<LaunshPage> {
             child: Row(
               children: [
                 ElevatedButton.icon(
-                  icon: const Icon(Icons.folder_open),
-                  onPressed: _pickAndLoadFile,
-                  label: const Text('Select Config File'),
+                  icon: const Icon(Icons.folder),
+                  onPressed: _pickWorkingDir,
+                  label: const Text('Select Working Directory'),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Text(
-                    _configFilePath ?? 'No file selected',
-                    style: const TextStyle(fontStyle: FontStyle.italic),
+                    _workingDir ?? 'No working directory selected',
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                if (_configFilePath != null)
+                if (_workingDir != null)
                   IconButton(
                     icon: const Icon(Icons.refresh),
-                    tooltip: 'Reload config file',
+                    tooltip: 'Reload working directory',
                     onPressed: () {
-                      // Re-run the file load logic
-                      if (_configFilePath != null) {
+                      if (_workingDir != null) {
                         setState(() {
-                          _logController.add('Reloaded configuration from: $_configFilePath');
+                          _logController.add(
+                            'Reloaded working directory: $_workingDir',
+                          );
                         });
                       }
                     },
@@ -78,7 +82,7 @@ class _LaunshPageState extends State<LaunshPage> {
           Expanded(
             flex: 3,
             child: ExecutionList(
-              configFilePath: _configFilePath,
+              workingDir: _workingDir,
               onLog: _logController.add,
             ),
           ),

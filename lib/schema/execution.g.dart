@@ -12,7 +12,6 @@ Execution _$ExecutionFromJson(Map<String, dynamic> json) => Execution(
   args:
       (json['args'] as List<dynamic>?)?.map((e) => e as String).toList() ??
       const [],
-  workingDir: json['working_dir'] as String?,
   environment:
       (json['environment'] as Map<String, dynamic>?)?.map(
         (k, e) => MapEntry(k, e as String),
