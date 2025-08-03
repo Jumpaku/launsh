@@ -31,7 +31,9 @@
       ],
       "environment": {
         "TODAY": "Monday"
-      }
+      },
+      "stdout": "stdout.log",
+      "stderr": "stderr.log"
     },
     "Show environment": {
       "description": "A sample command that uses environment variables and arguments with variables.",

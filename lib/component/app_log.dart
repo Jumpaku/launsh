@@ -1,12 +1,12 @@
-// lib/component/execution_log.dart
+// lib/component/app_log.dart
 
 import 'package:flutter/material.dart';
-import 'package:launsh/component/execution_log_controller.dart';
+import 'package:launsh/component/app_log_controller.dart';
 
-class ExecutionLog extends StatelessWidget {
-  final ExecutionLogController controller;
+class AppLog extends StatelessWidget {
+  final AppLogController controller;
 
-  const ExecutionLog({super.key, required this.controller});
+  const AppLog({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class ExecutionLog extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Execution Log',
+              'Log',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
@@ -32,7 +32,7 @@ class ExecutionLog extends StatelessWidget {
                 ),
                 child: SingleChildScrollView(
                   reverse: true,
-                  child: Text(controller.log),
+                  child: SelectableText(controller.log),
                 ),
               ),
             ),

@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-class ExecutionLogController extends ChangeNotifier {
+class AppLogController extends ChangeNotifier {
   final StringBuffer _buffer = StringBuffer();
 
   String get log => _buffer.toString();

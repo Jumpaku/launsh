@@ -4,17 +4,20 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:launsh/component/run_dialog.dart';
 import 'package:launsh/schema/execution.dart';
+import 'package:path/path.dart' as path;
 
 // Callback type for logging messages.
 typedef LogCallback = void Function(String message);
 
 class ExecutionEntry extends StatefulWidget {
+  final String configDir;
   final String name;
   final Execution execution;
   final LogCallback onLog; // Callback to send logs to the parent.
 
   const ExecutionEntry({
     super.key,
+    required this.configDir,
     required this.name,
     required this.execution,
     required this.onLog,
@@ -63,30 +66,41 @@ class _ExecutionEntryState extends State<ExecutionEntry> {
 
   Future<void> _runExecution() async {
     widget.onLog('Running command: $_interpolatedCommand');
-    final execution =  widget.execution;
+    final execution = widget.execution;
+    final workingDir = path.join(widget.configDir, execution.workingDir);
+
     try {
       final variables = {
         for (final e in _variableControllers.entries) e.key: e.value.text,
       };
+      final stdout = execution.stdout == null ? null : path.join(workingDir, execution.stdout);
+      final stderr = execution.stderr == null ? null : path.join(workingDir, execution.stderr);
+      if (stdout != null) {
+        File(stdout).createSync(recursive: true);
+      }
+      if (stderr != null) {
+        File(stderr).createSync(recursive: true);
+      }
+
       final process = await Process.start(
         execution.program,
         execution.args,
-        workingDirectory: execution.workingDir,
+        workingDirectory: workingDir,
         environment: execution.environment..addEntries(variables.entries),
         runInShell: true,
       );
 
       process.stdout.transform(utf8.decoder).listen((data) {
         if (data.trim().isNotEmpty) widget.onLog('STDOUT: ${data.trim()}');
-        if (execution.stdout != null) {
-          File(execution.stdout!).writeAsStringSync(data,mode: FileMode.writeOnlyAppend);
+        if (stdout != null) {
+          File(stdout).writeAsStringSync(data, mode: FileMode.writeOnlyAppend);
         }
       });
 
       process.stderr.transform(utf8.decoder).listen((data) {
         if (data.trim().isNotEmpty) widget.onLog('STDERR: ${data.trim()}');
-        if (execution.stderr != null) {
-          File(execution.stderr!).writeAsStringSync(data,mode: FileMode.writeOnlyAppend);
+        if (stderr != null) {
+          File(stderr).writeAsStringSync(data, mode: FileMode.writeOnlyAppend);
         }
       });
 

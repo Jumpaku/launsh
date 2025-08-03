@@ -1,8 +1,8 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:launsh/component/execution_list.dart';
-import 'package:launsh/component/execution_log.dart';
-import 'package:launsh/component/execution_log_controller.dart';
+import 'package:launsh/component/app_log.dart';
+import 'package:launsh/component/app_log_controller.dart';
 
 class LaunshPage extends StatefulWidget {
   const LaunshPage({super.key});
@@ -13,7 +13,7 @@ class LaunshPage extends StatefulWidget {
 
 class _LaunshPageState extends State<LaunshPage> {
   String? _configFilePath;
-  final ExecutionLogController _logController = ExecutionLogController();
+  final AppLogController _logController = AppLogController();
 
   Future<void> _pickAndLoadFile() async {
     final result = await FilePicker.platform.pickFiles(
@@ -83,7 +83,7 @@ class _LaunshPageState extends State<LaunshPage> {
             ),
           ),
           const SizedBox(height: 16),
-          Expanded(flex: 2, child: ExecutionLog(controller: _logController)),
+          Expanded(flex: 2, child: AppLog(controller: _logController)),
         ],
       ),
     );

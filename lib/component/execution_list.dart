@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as path;
 import 'package:launsh/component/execution_entry.dart';
 import 'package:launsh/schema/config.dart';
 
@@ -74,6 +75,7 @@ class _ExecutionListState extends State<ExecutionList> {
         return ExecutionEntry(
           // Using a key is good practice for lists of stateful widgets
           key: ValueKey(name),
+          configDir: path.dirname(widget.configFilePath!),
           name: name,
           execution: execution,
           onLog: widget.onLog,
