@@ -1,0 +1,55 @@
+name: Build Flutter Application
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-windows:
+    name: Build for Windows
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.2'
+          cache: true
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Build Windows application
+        run: flutter build windows --release
+      - name: Package Windows release
+        run: Compress-Archive -Path build/windows/runner/Release -DestinationPath launsh-windows-${{ github.ref_name }}.zip
+        shell: pwsh
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: launsh-windows-release-${{ github.ref_name }}
+          path: launsh-windows-${{ github.ref_name }}.zip
+
+  build-macos:
+    name: Build for macOS
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.2'
+          cache: true
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Build macOS application
+        run: flutter build macos --release
+      - name: Package macOS release
+        run: zip -r launsh-macos-${{ github.ref_name }}.zip build/macos/Build/Products/Release/launsh.app
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: launsh-macos-release-${{ github.ref_name }}
+          path: launsh-macos-${{ github.ref_name }}.zip
