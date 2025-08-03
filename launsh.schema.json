@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Launsh Configuration",
+  "description": "Configuration file for launsh, a GUI script launcher.",
+  "type": "object",
+  "properties": {
+    "executions": {
+      "description": "A map of all defined executions, where the key is the execution name.",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/Execution"
+      }
+    }
+  },
+  "definitions": {
+    "Execution": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "description": "A description of what the execution does.",
+          "type": "string"
+        },
+        "program": {
+          "description": "The entrypoint of the execution.",
+          "type": "string"
+        },
+        "args": {
+          "description": "A list of arguments for the execution.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "working_dir": {
+          "description": "The working directory from which to run the execution.",
+          "type": "string"
+        },
+        "stdout": {
+          "description": "The path to a file to which standard output is redirected.",
+          "type": "string"
+        },
+        "stderr": {
+          "description": "The path to a file to which standard error is redirected.",
+          "type": "string"
+        },
+        "environment": {
+          "description": "A map of environment variables for the execution.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "variable": {
+          "description": "A list of variables for the execution.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "program"
+      ]
+    }
+  }
+}
