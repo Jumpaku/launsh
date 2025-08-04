@@ -23,7 +23,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           flutter pub get
+          flutter config --enable-windows-desktop
           flutter build windows --release
+          find .
           powershell Compress-Archive -Path build/windows/x64/runner/Release -DestinationPath launsh-windows-x64-${GITHUB_REF_NAME}.zip
           gh release upload --clobber "${GITHUB_REF_NAME}" "launsh-windows-x64-${GITHUB_REF_NAME}.zip"
 
