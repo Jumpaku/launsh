@@ -25,8 +25,8 @@ jobs:
           flutter config --enable-windows-desktop
           flutter pub get
           flutter build windows --release
-          Compress-Archive -Path .\build\windows\x64\runner\Release\ -DestinationPath .\launsh-windows-x64-${env:GITHUB_REF_NAME}.zip
-          gh release upload --clobber "${GITHUB_REF_NAME}" "launsh-windows-x64-${env:GITHUB_REF_NAME}.zip"
+          Compress-Archive -Path .\build\windows\x64\runner\Release\* -DestinationPath .\launsh-windows-x64-${env:GITHUB_REF_NAME}.zip
+          gh release upload --clobber "${env:GITHUB_REF_NAME}" "launsh-windows-x64-${env:GITHUB_REF_NAME}.zip"
 
   build-macos:
     name: Build for macOS
