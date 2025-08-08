@@ -1,38 +1,38 @@
 import 'package:json_annotation/json_annotation.dart';
 
-part 'execution.g.dart';
+part 'entrypoint.g.dart';
 
 /// Represents a single executable command configuration.
 @JsonSerializable(createToJson: false)
-class Execution {
-  const Execution({
+class Entrypoint {
+  const Entrypoint({
     this.description,
     required this.program,
     this.args = const [],
     this.environment = const {},
-    this.variable = const [],
+    this.parameter = const [],
     this.stdout,
     this.stderr,
   });
 
-  /// Creates an Execution from a JSON object.
-  factory Execution.fromJson(Map<String, dynamic> json) =>
-      _$ExecutionFromJson(json);
+  /// Creates an Entrypoint from a JSON object.
+  factory Entrypoint.fromJson(Map<String, dynamic> json) =>
+      _$EntrypointFromJson(json);
 
-  /// A description of what the execution does.
+  /// A description of what the Entrypoint does.
   final String? description;
 
-  /// The entrypoint of the execution.
+  /// The Entrypoint of the execution.
   final String program;
 
-  /// A list of arguments for the execution.
+  /// A list of arguments for the entrypoint.
   final List<String> args;
 
-  /// A map of environment variables for the execution.
+  /// A map of environment variables for the entrypoint.
   final Map<String, String> environment;
 
-  /// A list of variables for the execution.
-  final List<String> variable;
+  /// A list of parameters for the entrypoint.
+  final List<String> parameter;
 
   /// The path to a file to which standard output is redirected.
   final String? stdout;

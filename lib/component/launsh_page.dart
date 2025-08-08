@@ -4,8 +4,9 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:launsh/component/app_log.dart';
 import 'package:launsh/component/app_log_controller.dart';
-import 'package:launsh/component/execution_list.dart';
+import 'package:launsh/component/entrypoint_list.dart';
 import 'package:path/path.dart' as path;
+import 'package:url_launcher/url_launcher.dart';
 
 class LaunshPage extends StatefulWidget {
   const LaunshPage({super.key});
@@ -17,6 +18,9 @@ class LaunshPage extends StatefulWidget {
 class _LaunshPageState extends State<LaunshPage> {
   String? _workingDir;
   final AppLogController _logController = AppLogController();
+  double _leftPanelFraction = 0.6; // 左パネルの幅割合
+  static const double _minPanelFraction = 0.2;
+  static const double _maxPanelFraction = 0.8;
 
   Future<void> _pickWorkingDir() async {
     final workingDir = await FilePicker.platform.getDirectoryPath();
@@ -45,6 +49,7 @@ class _LaunshPageState extends State<LaunshPage> {
       appBar: AppBar(title: const Text('Launsh GUI')),
       body: Column(
         children: [
+          // 上部にフォルダ選択コントロール
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Row(
@@ -61,6 +66,20 @@ class _LaunshPageState extends State<LaunshPage> {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
+                if (_workingDir != null)
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.description),
+                    label: const Text('Open Config'),
+                    onPressed: () async {
+                      final configPath = path.join(_workingDir!, 'launsh.json');
+                      final uri = Uri.file(configPath);
+                      if (!await launchUrl(uri)) {
+                        _logController.add(
+                          'Could not open config file: $configPath',
+                        );
+                      }
+                    },
+                  ),
                 if (_workingDir != null)
                   IconButton(
                     icon: const Icon(Icons.refresh),
@@ -79,15 +98,59 @@ class _LaunshPageState extends State<LaunshPage> {
             ),
           ),
           const Divider(),
+          // 下部にExecutionListとAppLogを左右に並べる（ドラッグ可能な分割線付き）
           Expanded(
-            flex: 3,
-            child: ExecutionList(
-              workingDir: _workingDir,
-              onLog: _logController.add,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final width = constraints.maxWidth;
+                final leftWidth = width * _leftPanelFraction;
+                final rightWidth = width * (1 - _leftPanelFraction);
+                return Row(
+                  children: [
+                    SizedBox(
+                      width: leftWidth,
+                      child: EntrypointList(
+                        workingDir: _workingDir,
+                        onLog: _logController.add,
+                      ),
+                    ),
+                    // ドラッグ可能な分割線
+                    GestureDetector(
+                      behavior: HitTestBehavior.translucent,
+                      onHorizontalDragUpdate: (details) {
+                        setState(() {
+                          _leftPanelFraction += details.delta.dx / width;
+                          _leftPanelFraction = _leftPanelFraction.clamp(
+                            _minPanelFraction,
+                            _maxPanelFraction,
+                          );
+                        });
+                      },
+                      child: MouseRegion(
+                        cursor: SystemMouseCursors.resizeColumn,
+                        child: Container(
+                          width: 8,
+                          height: double.infinity,
+                          color: Colors.grey[300],
+                          child: const Center(
+                            child: VerticalDivider(
+                              width: 8,
+                              thickness: 2,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: rightWidth - 8, // 分割線の幅を引く
+                      child: AppLog(controller: _logController),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
-          const SizedBox(height: 16),
-          Expanded(flex: 2, child: AppLog(controller: _logController)),
         ],
       ),
     );

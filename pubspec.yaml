@@ -39,6 +39,7 @@ dependencies:
   json_annotation: ^4.8.1
   file_picker: ^10.2.1
   path: ^1.9.1
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:

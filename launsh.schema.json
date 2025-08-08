@@ -4,16 +4,16 @@
   "description": "Configuration file for launsh, a GUI script launcher.",
   "type": "object",
   "properties": {
-    "executions": {
+    "entrypoints": {
       "description": "A map of all defined executions, where the key is the execution name.",
       "type": "object",
       "additionalProperties": {
-        "$ref": "#/definitions/Execution"
+        "$ref": "#/definitions/Entrypoint"
       }
     }
   },
   "definitions": {
-    "Execution": {
+    "Entrypoint": {
       "type": "object",
       "properties": {
         "description": {
@@ -40,14 +40,14 @@
           "type": "string"
         },
         "environment": {
-          "description": "A map of environment variables for the execution.",
+          "description": "A map of environment parameters for the execution.",
           "type": "object",
           "additionalProperties": {
             "type": "string"
           }
         },
-        "variable": {
-          "description": "A list of variables for the execution.",
+        "parameter": {
+          "description": "A list of parameters for the execution.",
           "type": "array",
           "items": {
             "type": "string"

@@ -16,9 +16,19 @@ class AppLog extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Log',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Row(
+              children: [
+                const Text(
+                  'Log',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const Spacer(),
+                IconButton(
+                  icon: const Icon(Icons.clear),
+                  tooltip: 'Clear log',
+                  onPressed: () => controller.clear(),
+                ),
+              ],
             ),
             const SizedBox(height: 8),
             Expanded(

@@ -2,29 +2,29 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:launsh/component/execution_entry.dart';
+import 'package:launsh/component/entrypoint.dart';
 import 'package:launsh/schema/config.dart';
 import 'package:path/path.dart' as path;
 
-class ExecutionList extends StatefulWidget {
+class EntrypointList extends StatefulWidget {
   final String? workingDir;
   final LogCallback onLog;
 
-  const ExecutionList({
+  const EntrypointList({
     super.key,
     required this.workingDir,
     required this.onLog,
   });
 
   @override
-  State<ExecutionList> createState() => _ExecutionListState();
+  State<EntrypointList> createState() => _EntrypointListState();
 }
 
-class _ExecutionListState extends State<ExecutionList> {
+class _EntrypointListState extends State<EntrypointList> {
   Config? _config;
 
   @override
-  void didUpdateWidget(covariant ExecutionList oldWidget) {
+  void didUpdateWidget(covariant EntrypointList oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.workingDir != null) {
       _loadConfig(path.join(widget.workingDir!, 'launsh.json'));
@@ -66,26 +66,32 @@ class _ExecutionListState extends State<ExecutionList> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.workingDir == null) {
-      return const Center(child: Text('Please select a working directory.'));
-    }
-    if (_config == null) {
-      return const Center(child: Text('Loading or failed to load config...'));
-    }
-    return ListView(
-      padding: const EdgeInsets.all(8),
-      children: _config!.executions.entries.map((entry) {
-        final name = entry.key;
-        final execution = entry.value;
-        return ExecutionEntry(
-          // Using a key is good practice for lists of stateful widgets
-          key: ValueKey(name),
-          workingDir: widget.workingDir!,
-          name: name,
-          execution: execution,
-          onLog: widget.onLog,
-        );
-      }).toList(),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Entrypoints',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        if (widget.workingDir != null && _config != null)
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.all(8),
+              children: _config!.entrypoints.entries.map((entry) {
+                final name = entry.key;
+                final execution = entry.value;
+                return EntrypointElement(
+                  // Using a key is good practice for lists of stateful widgets
+                  key: ValueKey(name),
+                  workingDir: widget.workingDir!,
+                  name: name,
+                  entrypoint: execution,
+                  onLog: widget.onLog,
+                );
+              }).toList(),
+            ),
+          ),
+      ],
     );
   }
 }

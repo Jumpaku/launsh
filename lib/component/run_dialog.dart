@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 
 class RunDialog extends StatelessWidget {
   final String command;
-  final List<String> variableNames;
-  final Map<String, TextEditingController> variableControllers;
+  final List<String> parameterNames;
+  final Map<String, TextEditingController> parameterControllers;
 
   const RunDialog({
     super.key,
     required this.command,
-    required this.variableNames,
-    required this.variableControllers,
+    required this.parameterNames,
+    required this.parameterControllers,
   });
 
   @override
@@ -26,13 +26,13 @@ class RunDialog extends StatelessWidget {
               Text('Run the following command?'),
               const SizedBox(height: 8),
               Text(command, style: const TextStyle(fontFamily: 'monospace')),
-              if (variableNames.isNotEmpty) ...[
+              if (parameterNames.isNotEmpty) ...[
                 const SizedBox(height: 16),
-                const Text('Set variables:'),
-                ...variableNames.map((v) => Padding(
+                const Text('Set parameters:'),
+                ...parameterNames.map((v) => Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4.0),
                   child: TextField(
-                    controller: variableControllers[v],
+                    controller: parameterControllers[v],
                     decoration: InputDecoration(labelText: v),
                   ),
                 )),

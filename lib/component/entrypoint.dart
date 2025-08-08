@@ -3,51 +3,51 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:launsh/component/run_dialog.dart';
-import 'package:launsh/schema/execution.dart';
+import 'package:launsh/schema/entrypoint.dart';
 import 'package:path/path.dart' as path;
 
 // Callback type for logging messages.
 typedef LogCallback = void Function(String message);
 
-class ExecutionEntry extends StatefulWidget {
+class EntrypointElement extends StatefulWidget {
   final String workingDir;
   final String name;
-  final Execution execution;
+  final Entrypoint entrypoint;
   final LogCallback onLog; // Callback to send logs to the parent.
 
-  const ExecutionEntry({
+  const EntrypointElement({
     super.key,
     required this.workingDir,
     required this.name,
-    required this.execution,
+    required this.entrypoint,
     required this.onLog,
   });
 
   @override
-  State<ExecutionEntry> createState() => _ExecutionEntryState();
+  State<EntrypointElement> createState() => _EntrypointElementState();
 }
 
-class _ExecutionEntryState extends State<ExecutionEntry> {
-  late final Map<String, TextEditingController> _variableControllers;
+class _EntrypointElementState extends State<EntrypointElement> {
+  late final Map<String, TextEditingController> _parameterControllers;
 
   @override
   void initState() {
     super.initState();
-    _variableControllers = {
-      for (final v in widget.execution.variable) v: TextEditingController(),
+    _parameterControllers = {
+      for (final v in widget.entrypoint.parameter) v: TextEditingController(),
     };
   }
 
   @override
   void dispose() {
-    for (final controller in _variableControllers.values) {
+    for (final controller in _parameterControllers.values) {
       controller.dispose();
     }
     super.dispose();
   }
 
   String get _command {
-    return '${widget.execution.program} ${widget.execution.args.join(' ')}';
+    return '${widget.entrypoint.program} ${widget.entrypoint.args.join(' ')}';
   }
 
   Future<void> _confirmAndRunExecution(BuildContext context) async {
@@ -55,8 +55,8 @@ class _ExecutionEntryState extends State<ExecutionEntry> {
       context: context,
       builder: (context) => RunDialog(
         command: _command,
-        variableNames: widget.execution.variable,
-        variableControllers: _variableControllers,
+        parameterNames: widget.entrypoint.parameter,
+        parameterControllers: _parameterControllers,
       ),
     );
     if (confirmed == true) {
@@ -66,7 +66,7 @@ class _ExecutionEntryState extends State<ExecutionEntry> {
 
   Future<void> _runExecution() async {
     widget.onLog('Running command: $_command');
-    final execution = widget.execution;
+    final execution = widget.entrypoint;
     final workingDir = widget.workingDir;
     final stdout = execution.stdout == null
         ? null
@@ -76,8 +76,8 @@ class _ExecutionEntryState extends State<ExecutionEntry> {
         : File(path.join(workingDir, execution.stderr!));
 
     try {
-      final variables = {
-        for (final e in _variableControllers.entries) e.key: e.value.text,
+      final parameters = {
+        for (final e in _parameterControllers.entries) e.key: e.value.text,
       };
       stdout?.createSync(recursive: true);
       stderr?.createSync(recursive: true);
@@ -86,7 +86,7 @@ class _ExecutionEntryState extends State<ExecutionEntry> {
         execution.program,
         execution.args,
         workingDirectory: workingDir,
-        environment: execution.environment..addEntries(variables.entries),
+        environment: {}..addEntries(execution.environment.entries)..addEntries(parameters.entries),
         runInShell: true,
       );
 
@@ -119,7 +119,7 @@ class _ExecutionEntryState extends State<ExecutionEntry> {
             Row(
               children: [
                 Tooltip(
-                  message: widget.execution.description ?? '',
+                  message: widget.entrypoint.description ?? '',
                   child: Text(
                     widget.name,
                     style: const TextStyle(

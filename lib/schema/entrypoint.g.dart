@@ -1,12 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'execution.dart';
+part of 'entrypoint.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-Execution _$ExecutionFromJson(Map<String, dynamic> json) => Execution(
+Entrypoint _$EntrypointFromJson(Map<String, dynamic> json) => Entrypoint(
   description: json['description'] as String?,
   program: json['program'] as String,
   args:
@@ -17,8 +17,8 @@ Execution _$ExecutionFromJson(Map<String, dynamic> json) => Execution(
         (k, e) => MapEntry(k, e as String),
       ) ??
       const {},
-  variable:
-      (json['variable'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+  parameter:
+      (json['parameter'] as List<dynamic>?)?.map((e) => e as String).toList() ??
       const [],
   stdout: json['stdout'] as String?,
   stderr: json['stderr'] as String?,

@@ -7,9 +7,9 @@ part of 'config.dart';
 // **************************************************************************
 
 Config _$ConfigFromJson(Map<String, dynamic> json) => Config(
-  executions:
-      (json['executions'] as Map<String, dynamic>?)?.map(
-        (k, e) => MapEntry(k, Execution.fromJson(e as Map<String, dynamic>)),
+  entrypoints:
+      (json['entrypoints'] as Map<String, dynamic>?)?.map(
+        (k, e) => MapEntry(k, Entrypoint.fromJson(e as Map<String, dynamic>)),
       ) ??
       const {},
 );

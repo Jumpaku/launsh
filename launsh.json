@@ -1,6 +1,6 @@
 {
   "$schema": "./launsh.schema.json",
-  "executions": {
+  "entrypoints": {
     "List Current Directory": {
       "description": "Lists files and directories in the current path.",
       "program": "ls",
@@ -20,13 +20,13 @@
       "stderr": "python_version.txt"
     },
     "Greet User": {
-      "description": "A sample command that uses environment variables and arguments with variables.",
+      "description": "A sample command that uses environment variables and arguments with parameters.",
       "program": "bash",
       "args": [
         "-c",
         "echo \"Hello, ${USER_NAME}! Today is ${TODAY}.\""
       ],
-      "variable": [
+      "parameter": [
         "USER_NAME"
       ],
       "environment": {
@@ -36,9 +36,9 @@
       "stderr": "stderr.log"
     },
     "Show environment": {
-      "description": "A sample command that uses environment variables and arguments with variables.",
+      "description": "A sample command that uses environment variables and arguments with parameters.",
       "program": "env",
-      "variable": [
+      "parameter": [
         "USER_NAME",
         "USER_NAME2",
         "USER_NAME3",
@@ -51,9 +51,22 @@
       }
     },
     "reload": {
-      "description": "A sample command that uses environment variables and arguments with variables.",
+      "description": "A sample command that uses environment variables and arguments with parameters.",
       "program": "env",
-      "variable": [
+      "parameter": [
+        "USER_NAME"
+      ],
+      "environment": {
+        "TODAY": "Monday"
+      }
+    },
+    "Run script": {
+      "description": "A sample command that uses environment parameters and arguments with parameters.",
+      "program": "sh",
+      "args": ["./run.sh"],
+      "stdout": "stdout.log",
+      "stderr": "stderr.log",
+      "parameter": [
         "USER_NAME"
       ],
       "environment": {
