@@ -1,3 +1,0 @@
-/bin/sh: /opt/homebrew/bin/python3: Operation not permitted
-Python 3.13.0
-Python 3.13.0

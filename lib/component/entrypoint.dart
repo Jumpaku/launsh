@@ -1,10 +1,7 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:launsh/component/run_dialog.dart';
+import 'package:launsh/run_entrypoint.dart';
 import 'package:launsh/schema/entrypoint.dart';
-import 'package:path/path.dart' as path;
 
 // Callback type for logging messages.
 typedef LogCallback = void Function(String message);
@@ -66,41 +63,16 @@ class _EntrypointElementState extends State<EntrypointElement> {
 
   Future<void> _runExecution() async {
     widget.onLog('Running command: $_command');
-    final execution = widget.entrypoint;
-    final workingDir = widget.workingDir;
-    final stdout = execution.stdout == null
-        ? null
-        : File(path.join(workingDir, execution.stdout!));
-    final stderr = execution.stderr == null
-        ? null
-        : File(path.join(workingDir, execution.stderr!));
-
     try {
       final parameters = {
         for (final e in _parameterControllers.entries) e.key: e.value.text,
       };
-      stdout?.createSync(recursive: true);
-      stderr?.createSync(recursive: true);
-
-      final process = await Process.start(
-        execution.program,
-        execution.args,
-        workingDirectory: workingDir,
-        environment: {}..addEntries(execution.environment.entries)..addEntries(parameters.entries),
-        runInShell: true,
+      final exitCode = await runEntrypoint(
+        widget.workingDir,
+        widget.entrypoint,
+        parameters,
+        widget.onLog,
       );
-
-      process.stdout.transform(utf8.decoder).listen((data) {
-        if (data.trim().isNotEmpty) widget.onLog('STDOUT: ${data.trim()}');
-        stdout?.writeAsStringSync(data, mode: FileMode.writeOnlyAppend);
-      });
-
-      process.stderr.transform(utf8.decoder).listen((data) {
-        if (data.trim().isNotEmpty) widget.onLog('STDERR: ${data.trim()}');
-        stderr?.writeAsStringSync(data, mode: FileMode.writeOnlyAppend);
-      });
-
-      final exitCode = await process.exitCode;
       widget.onLog('Process exited with code $exitCode');
     } catch (e) {
       widget.onLog('Failed to run command: $e');
