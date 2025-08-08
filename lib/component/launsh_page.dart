@@ -18,7 +18,7 @@ class LaunshPage extends StatefulWidget {
 class _LaunshPageState extends State<LaunshPage> {
   String? _workingDir;
   final AppLogController _logController = AppLogController();
-  double _leftPanelFraction = 0.6; // 左パネルの幅割合
+  double _leftPanelFraction = 0.6;
   static const double _minPanelFraction = 0.2;
   static const double _maxPanelFraction = 0.8;
 
@@ -49,7 +49,6 @@ class _LaunshPageState extends State<LaunshPage> {
       appBar: AppBar(title: const Text('Launsh GUI')),
       body: Column(
         children: [
-          // 上部にフォルダ選択コントロール
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Row(
@@ -98,7 +97,6 @@ class _LaunshPageState extends State<LaunshPage> {
             ),
           ),
           const Divider(),
-          // 下部にExecutionListとAppLogを左右に並べる（ドラッグ可能な分割線付き）
           Expanded(
             child: LayoutBuilder(
               builder: (context, constraints) {
@@ -114,7 +112,6 @@ class _LaunshPageState extends State<LaunshPage> {
                         onLog: _logController.add,
                       ),
                     ),
-                    // ドラッグ可能な分割線
                     GestureDetector(
                       behavior: HitTestBehavior.translucent,
                       onHorizontalDragUpdate: (details) {
@@ -143,7 +140,7 @@ class _LaunshPageState extends State<LaunshPage> {
                       ),
                     ),
                     SizedBox(
-                      width: rightWidth - 8, // 分割線の幅を引く
+                      width: rightWidth - 8,
                       child: AppLog(controller: _logController),
                     ),
                   ],
