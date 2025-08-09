@@ -1,11 +1,11 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Launsh Configuration",
-  "description": "Configuration file for launsh, a GUI script launcher.",
+  "description": "Defines the structure of the launsh.json configuration file for the launsh application. This schema describes how to declare entrypoints that launch scripts or commands, including their arguments, environment variables, and output redirection. Each entrypoint must specify at least a 'program' to execute. See each property for details.",
   "type": "object",
   "properties": {
     "entrypoints": {
-      "description": "A map of all defined executions, where the key is the execution name.",
+      "description": "A mapping of entrypoint names to their execution definitions. Each key is a unique entrypoint name, and each value describes how to run that entrypoint.",
       "type": "object",
       "additionalProperties": {
         "$ref": "#/definitions/Entrypoint"
@@ -17,37 +17,37 @@
       "type": "object",
       "properties": {
         "description": {
-          "description": "A description of what the execution does.",
+          "description": "A human-readable summary of what this entrypoint does.",
           "type": "string"
         },
         "program": {
-          "description": "The entrypoint of the execution.",
+          "description": "The executable or script to run for this entrypoint. This is required.",
           "type": "string"
         },
         "args": {
-          "description": "A list of arguments for the execution.",
+          "description": "A list of command-line arguments to pass to the program for this entrypoint.",
           "type": "array",
           "items": {
             "type": "string"
           }
         },
         "stdout": {
-          "description": "The path to a file to which standard output is redirected.",
+          "description": "If specified, standard output will be redirected to this file path for this entrypoint.",
           "type": "string"
         },
         "stderr": {
-          "description": "The path to a file to which standard error is redirected.",
+          "description": "If specified, standard error will be redirected to this file path for this entrypoint.",
           "type": "string"
         },
         "environment": {
-          "description": "A map of environment parameters for the execution.",
+          "description": "A mapping of environment variable names to their values for this entrypoint.",
           "type": "object",
           "additionalProperties": {
             "type": "string"
           }
         },
         "parameter": {
-          "description": "A list of parameters for the execution.",
+          "description": "A list of parameter names that can be used in environment variables for this entrypoint.",
           "type": "array",
           "items": {
             "type": "string"
