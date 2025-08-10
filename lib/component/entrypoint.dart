@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart' as crypt;
 import 'package:flutter/material.dart';
 import 'package:launsh/component/run_dialog.dart';
 import 'package:launsh/run_entrypoint.dart';
@@ -26,6 +29,13 @@ class EntrypointElement extends StatefulWidget {
 
 class _EntrypointElementState extends State<EntrypointElement> {
   late final Map<String, TextEditingController> _parameterControllers;
+
+  Color _colorFromName(String name) {
+    final bytes = crypt.sha256.convert(utf8.encode(name)).bytes;
+    final argb = Color.fromARGB(255, bytes[0], bytes[1], bytes[2]);
+    final hsv = HSVColor.fromColor(argb);
+    return hsv.withSaturation(0.35).withValue(0.8).toColor();
+  }
 
   @override
   void initState() {
@@ -83,6 +93,7 @@ class _EntrypointElementState extends State<EntrypointElement> {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8),
+      color: _colorFromName(widget.name),
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
